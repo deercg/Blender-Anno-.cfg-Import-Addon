@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 import bpy
 from bpy.types import Object as BlenderObject
 import xml.etree.ElementTree as ET
@@ -511,8 +511,10 @@ class Material:
         links = node_tree.links
         nodes = node_tree.nodes
         
-        anno_shader = self.add_anno_shader(nodes)
-        material.node_tree.nodes.remove(nodes["Principled BSDF"])
+        #anno_shader = self.add_anno_shader(nodes)
+        
+        bsdf = nodes.get("Principled BSDF")
+        #material.node_tree.nodes.remove(nodes["Principled BSDF"])
         
         emissive_color = self.add_shader_node(node_tree, "ShaderNodeCombineRGB",
                             name = "cEmissiveColor",
@@ -535,7 +537,7 @@ class Material:
                             inputs = {}
         )
         
-        links.new(anno_shader.inputs["cDiffuse"], nodes[self.texture_names["diffuse"]].outputs[0])
+        """ links.new(anno_shader.inputs["cDiffuse"], nodes[self.texture_names["diffuse"]].outputs[0])
         links.new(anno_shader.inputs["cNormal"], nodes[self.texture_names["normal"]].outputs[0])
         links.new(anno_shader.inputs["cMetallic"], nodes[self.texture_names["metallic"]].outputs[0])
         links.new(anno_shader.inputs["cHeight"], nodes[self.texture_names["height"]].outputs[0])
@@ -546,10 +548,16 @@ class Material:
         links.new(anno_shader.inputs["cEmissiveColor"], emissive_color.outputs[0])
         
         links.new(anno_shader.inputs["Alpha"], nodes[self.texture_names["diffuse"]].outputs["Alpha"])
-        links.new(anno_shader.inputs["Glossiness"], nodes[self.texture_names["normal"]].outputs["Alpha"])
+        links.new(anno_shader.inputs["Glossiness"], nodes[self.texture_names["normal"]].outputs["Alpha"]) """
+
+
+        links.new(bsdf.inputs["Base Color"], nodes[self.texture_names["diffuse"]].outputs[0])
+        links.new(bsdf.inputs["Normal"], nodes[self.texture_names["normal"]].outputs[0])
+        links.new(bsdf.inputs["Alpha"], nodes[self.texture_names["diffuse"]].outputs["Alpha"])
+        links.new(bsdf.inputs["Metallic"], nodes[self.texture_names["metallic"]].outputs[0])
+        links.new(bsdf.inputs["Roughness"], nodes[self.texture_names["normal"]].outputs["Alpha"])
         
-        
-        links.new(nodes["Material Output"].inputs["Surface"], anno_shader.outputs["Shader"])
+        links.new(nodes["Material Output"].inputs["Surface"], bsdf.outputs["BSDF"])
         
         
         
