@@ -215,12 +215,12 @@ class ImportAnnoCfg(Operator, ImportHelper):
     also_import_ifo: BoolProperty( #type:  ignore
         name="Import .ifo",
         description="Also import the .ifo file with the same name.",
-        default=True,
+        default=False,
     )
     also_import_cf7: BoolProperty( #type:  ignore
         name="Import Feedback",
         description="Also import the .cf7/.xml file with the same name.",
-        default=True,
+        default=False,
     )
     import_feedback_type: EnumProperty( #type: ignore
         name="Feedback Type",
