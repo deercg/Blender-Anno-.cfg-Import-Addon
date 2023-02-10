@@ -200,7 +200,7 @@ class ExportAnnoCfg(Operator, ExportHelper):
 
 class ImportAnnoCfg(Operator, ImportHelper):
     """Parses Anno (1800) .cfg files and automatically imports and positions all models, props, particles and decals in the scene. Can also import .prp files into your scene, but you must select a parent object"""
-    bl_idname = "import.anno_cfg_files" 
+    bl_idname = "import_anno.cfg" 
     bl_label = "Import Anno .cfg Files"
 
     # ImportHelper mixin class uses this
@@ -241,34 +241,9 @@ class ImportAnnoCfg(Operator, ImportHelper):
     )
 
     def execute(self, context):
-        parent = context.active_object
-        dirname = os.path.dirname(self.filepath)
-        for f in self.files:
-            self.filepath = os.path.join(dirname, f.name)
-            print("IMPORTING FILE", self.filepath)
-            
-            self.path = Path(self.filepath)
-            if self.import_as_subfile:
-                self.import_subfile(context, parent)
-                continue
-            
-            if not self.path.suffix == ".cfg" or not self.path.exists():
-                self.report({'ERROR_INVALID_INPUT'}, f"Invalid file or extension")
-                return {'CANCELLED'}
-            
-            file_obj = self.import_cfg_file(self.path, "MAIN_FILE_" + self.path.name)
-            
-            if self.also_import_ifo:
-                self.import_ifo_file(self.path.with_suffix(".ifo"), file_obj)
-                
-            if self.also_import_cf7:
-                if self.import_feedback_type == "safe" and self.path.with_suffix(".xml").exists():
-                    self.import_safe_file(self.path.with_suffix(".xml"), file_obj)
-                else:
-                    self.import_cf7_file(self.path.with_suffix(".cf7"), file_obj)
-
-            self.report({'INFO'}, "Import of {self.filepath} completed!")
-        self.report({'INFO'}, "Imported all Files.")
+        self.path = Path(self.filepath)
+        file_obj = self.import_cfg_file(self.path, "MAIN_FILE_" + self.path.name)
+        self.report({'INFO'}, f"Imported {file_obj} Files.")
         return {'FINISHED'}
     
     def import_subfile(self, context, parent):
